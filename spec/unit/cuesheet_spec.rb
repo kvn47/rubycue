@@ -122,6 +122,10 @@ describe RubyCue::Cuesheet do
       it "has genre" do
         @cuesheet.genre.should == 'Rock'
       end
+
+      it "has date" do
+        @cuesheet.date.should == 2012
+      end
     end
   end
 

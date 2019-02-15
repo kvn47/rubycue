@@ -1,16 +1,17 @@
 module RubyCue
   class Cuesheet
-    attr_reader :cuesheet, :songs, :track_duration, :performer, :title, :file, :genre
+    attr_reader :cuesheet, :songs, :track_duration, :performer, :title, :file, :genre, :date
 
     def initialize(cuesheet, track_duration=nil)
-      @cuesheet = cuesheet      
+      @cuesheet = cuesheet
       @reg = {
-        :track => %r(TRACK (\d{1,3}) AUDIO),
-        :performer => %r(PERFORMER "(.*)"),
-        :title => %r(TITLE "(.*)"),
-        :index => %r(INDEX \d{1,3} (\d{1,3}):(\d{1,2}):(\d{1,2})),
-        :file => %r(FILE "(.*)"),
-        :genre => %r(REM GENRE (.*)\b)
+        track: /TRACK (\d{1,3}) AUDIO/,
+        performer: /PERFORMER "(.*)"/,
+        title: /TITLE "(.*)"/,
+        index: /INDEX \d{1,3} (\d{1,3}):(\d{1,2}):(\d{1,2})/,
+        file: /FILE "(.*)"/,
+        genre: /REM GENRE (.*)\b/,
+        date: /REM DATE (\d*)/
       }
       @track_duration = RubyCue::Index.new(track_duration) if track_duration
     end
@@ -24,6 +25,7 @@ module RubyCue
         song[:file] = parse_files[i]
       end
       parse_genre
+      parse_date
       raise RubyCue::InvalidCuesheet.new("Field amounts are not all present. Cuesheet is malformed!") unless valid?
       calculate_song_durations!
       true
@@ -97,6 +99,13 @@ module RubyCue
     def parse_genre
       @cuesheet.scan(@reg[:genre]) do |genre|
         @genre = genre.first
+        break
+      end
+    end
+
+    def parse_date
+      @cuesheet.scan(@reg[:date]) do |date|
+        @date = date.first.to_i
         break
       end
     end
