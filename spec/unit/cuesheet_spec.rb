@@ -15,7 +15,7 @@ describe RubyCue::Cuesheet do
   describe "#parse!" do
     context "properly formatted cuesheet" do
       it "returns true if successfully parsed" do
-        @cuesheet.parse!.should be_true
+        @cuesheet.parse!.should be_truthy
       end
       
       it "has the main performer" do
